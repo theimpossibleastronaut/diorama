@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Diorama Example</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
+        <script src="diorama.js"></script>
+
+        <style>
+            html, body {
+
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+
+            }
+
+        </style>
+
+        <script type="text/javascript">
+
+            $(document).ready(function() {
+
+                diorama.init( 'http://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Olso_panorama.jpg/2880px-Olso_panorama.jpg');
+
+            });
+
+        </script>
+
+    </head>
+    <body>
+        <div id="bodyContainer">
+
+        </div>
+    </body>
+</html>

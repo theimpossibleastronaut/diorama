@@ -1,0 +1,58 @@
+#diorama-container {
+
+    margin: 0;
+    padding: 0;
+
+    background: #000;
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    -webkit-touch-callout: none;
+    -touch-callout: none;
+
+    cursor: none;
+}
+
+.nohmd {
+
+    width: 100%;
+    height: 100%;
+
+}
+
+.dk1 {
+
+    width: 1280px;
+    height: 800px;
+
+}
+
+.dk2 {
+
+    width: 1920px;
+    height: 1080px;
+
+}
+
+.cr1 { /* TBA */
+
+    width: 1920px;
+    height: 1080px;
+
+}
+
+#diorama-helper-message {
+
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    border-bottom: 1px solid #000000;
+    background-color: #ffa700;
+    padding: 8px;
+
+    font-family: arial;
+
+}

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Diorama</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <style>
+            body,html {
+                background-color: #ffffff;
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+                overflow-x: hidden;
+                overflow-y: auto;
+
+                color: #000000;
+                font-family: Verdana;
+                font-size: 14px;
+            }
+
+            a, a:visited, a:hover {
+                color: #000000;
+                font-family: Verdana;
+                font-size: 14px;
+                text-decoration: none;
+            }
+
+            #logo {
+                width: 537px;
+                height: 124px;
+                padding: 48px 0 96px 48px;
+            }
+
+            .thumbs, #buttons, #wrapper h1 {
+                max-width: 100%;
+                margin: 0 48px 0 48px;
+            }
+
+            .thumbs div a img {
+                border: 4px solid #000000;
+
+            }
+
+            .thumbs div {
+
+                padding: 0;
+                float: left;
+                width: 200px;
+                text-align: center;
+            }
+        </style>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <script src="//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&key=AIzaSyD1w_eB3s8VGwWjDHtLhSd44vtR2cuHvM0" type="text/javascript"></script>
+        <script src="diorama.js"></script>
+        <script src="data/data.js"></script>
+
+        <script type="text/javascript">
+        $(document).ready(function() {
+
+            if ( !navigator.mozGetVRDevices && !navigator.getVRDevices ) {
+                diorama.setHmdPlugin("oculusBridge");
+            } else {
+                diorama.setHmdPlugin("webVR");
+            }
+
+            diorama.__properties.dependencies.push('vendor/GSVPano.js'); // depends on maps api
+
+            diorama.plugins.push('plugins/interactiveObjects.js');
+            diorama.plugins.push('plugins/virtualmouse.js');
+            diorama.plugins.push('plugins/startview.js');
+
+            diorama.observers.start = function () {
+                diorama.using( interactiveObjects );
+                diorama.using( virtualmouse );
+
+                //interactiveObjects.__enableLookAtInteractiveObject = false;
+            }
+
+            diorama.init();
+
+            var tabs = [data];
+            var wrapper = $('#wrapper');
+            $(tabs).each(function(ind, elem) {
+
+                diorama.dataFolder = elem.id;
+                var thumbsWrapper = $('<div class="thumbs thumbs-' + elem.id + '"></div>');
+                var switchButton = $('<button data-class="thumbs-' + elem.id + '" data-tabindex="' + ind + '">' + elem.title + '</button>');
+                $('#buttons').append(switchButton);
+                switchButton.on("click", function(e) {
+
+                    e.preventDefault();
+
+                    var dataElement = tabs[$(this).data('tabindex')];
+                    var dataClass = $(this).data('class');
+                    $('.thumbs').hide();
+                    $('.' + dataClass).show();
+
+                    $('#wrapper h1').text(dataElement.title);
+
+                });
+
+                $(elem.thumbnails).each(function (thumbInd, thumbElem) {
+
+                    var thumb = $('<div><a href="#"><img src="' + thumbElem.thumb + '" /><br /><p>'+ thumbElem.title +'</p></a></div>');
+                    thumb.attr('data-pano', thumbElem.pano);
+                    thumb.attr('data-hdeg', thumbElem.hdeg);
+                    thumb.attr('data-vdeg', thumbElem.vdeg);
+
+                    if (typeof(thumbElem.xmllist) != 'undefined') {
+                        thumb.attr('data-xmllist', thumbElem.xmllist.join(','));
+                    }
+
+                    if (typeof(thumbElem.startview) != 'undefined') {
+                        thumb.attr('data-startview', thumbElem.startview);
+                    }
+
+                    if (typeof(thumbElem.streetview) != 'undefined') {
+                        thumb.attr('data-streetview', thumbElem.streetview);
+                    }
+
+                    if (typeof(thumbElem.personHeight) == 'number') {
+                        thumb.attr('data-personheight', thumbElem.personHeight);
+                    }
+
+                    if (typeof(thumbElem.worldHeight) == 'number') {
+                        thumb.attr('data-worldheight', thumbElem.worldHeight);
+                    }
+
+                    thumb.on('click', function(e) {
+                        e.preventDefault();
+
+                        if (typeof($(this).data('startview')) != 'undefined' || typeof($(this).data('streetview')) != 'undefined') {
+                            var pluginOptions = {
+                                mediaItem: $(this).data('startview'),
+                                streetView: false,
+                                hdeg: 210,
+                                vdeg: 90,
+                                nextItem: {
+                                    hdeg: $(this).data('hdeg'),
+                                    vdeg: $(this).data('vdeg')
+                                }
+                            };
+
+                            if (typeof($(this).data('startview')) != 'undefined') {
+                                pluginOptions.streetViewItem = $(this).data('streetview');
+                                pluginOptions.streetView = true;
+                            }
+
+                            if (typeof($(this).data('xmllist')) != 'undefined') {
+                                pluginOptions.nextItem.xmllist = $(this).data('xmllist');
+                            } else if (typeof($(this).data('pano')) != 'undefined') {
+                                pluginOptions.nextItem.pano = $(this).data('pano');
+                            }
+
+                            diorama.using(simpleMediaLoader);
+
+                            diorama.using(startview, pluginOptions );
+                        } else if (typeof($(this).data('xmllist')) != 'undefined') {
+                            diorama.using(complexMediaLoader).play($(this).data('xmllist'), $(this).data('hdeg'), $(this).data('vdeg'));
+                        } else if (typeof($(this).data('pano')) != 'undefined') {
+                            diorama.using(sphericalWorld).play($(this).data('pano'), $(this).data('hdeg'), $(this).data('vdeg'));
+                        }
+
+                        //diorama.requestFullscreen();
+                        if ( !navigator.mozGetVRDevices && !navigator.getVRDevices ) {
+
+                            diorama.requestFullscreen();
+
+                        } else {
+
+                            if ( typeof( webVR ) != "undefined" && typeof( webVR.vrEffect ) != "undefined" && webVR.vrEffect != null) {
+
+                                if ( !document.mozFullScreenElement && !document.webkitFullScreenElement ) {
+
+                                    webVR.vrEffect.setFullScreen(true);
+
+                                }
+
+                            }
+                        }
+
+
+                    });
+
+                    $(thumbsWrapper).append(thumb);
+                });
+
+                thumbsWrapper.hide();
+
+                wrapper.append(thumbsWrapper);
+
+            });
+
+            $('#buttons button').first().trigger('click');
+        });
+
+        </script>
+
+    </head>
+    <body>
+
+        <div id="wrapper">
+            <div id="buttons"></div><br /><br />
+            <h1></h1><br /><br />
+
+        </div>
+    </body>
+</html>

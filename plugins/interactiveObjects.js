@@ -217,7 +217,7 @@ var interactiveObjects = interactiveObjects || {
 
                 var xs = Math.abs(iObject.angleH) - (angleH-75+diorama.__properties.lookAtCorrection);
                 var ys = iObject.angleV - angleV;
-console.log(angleH,angleV,iObject.angleH,iObject.angleV,xs,ys);
+//console.log(angleH,angleV,iObject.angleH,iObject.angleV,xs,ys);
                 var lastState = iObject.state;
 
                 if ( Math.abs( xs ) < 15 && Math.abs( ys ) < 10 ) {

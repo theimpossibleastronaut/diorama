@@ -605,6 +605,8 @@ var diorama = diorama || {
 
         }
 
+        diorama.renderer.setPixelRatio( window.devicePixelRatio );
+
         diorama.using(sphericalWorld);
         diorama.using(simpleMediaLoader);
 

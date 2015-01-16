@@ -5,67 +5,74 @@
 
 THREE.VRControls = function ( object, callback ) {
 
-    var vrInput;
+	var scope = this;
 
-    var onVRDevices = function ( devices ) {
+	var vrInput;
 
-        for ( var i = 0; i < devices.length; i ++ ) {
+	var onVRDevices = function ( devices ) {
 
-            var device = devices[ i ];
+		for ( var i = 0; i < devices.length; i ++ ) {
 
-            if ( device instanceof PositionSensorVRDevice ) {
+			var device = devices[ i ];
 
-                vrInput = devices[ i ];
-                return; // We keep the first we encounter
+			if ( device instanceof PositionSensorVRDevice ) {
 
-            }
+				vrInput = devices[ i ];
+				return; // We keep the first we encounter
 
-        }
+			}
 
-        if ( callback !== undefined ) {
+		}
 
-            callback( 'HMD not available' );
+		if ( callback !== undefined ) {
 
-        }
+			callback( 'HMD not available' );
 
-    };
+		}
 
-    if ( navigator.getVRDevices !== undefined ) {
+	};
 
-        navigator.getVRDevices().then( onVRDevices );
+	if ( navigator.getVRDevices !== undefined ) {
 
-    } else if ( callback !== undefined ) {
+		navigator.getVRDevices().then( onVRDevices );
 
-        callback( 'Your browser is not VR Ready' );
+	} else if ( callback !== undefined ) {
 
-    }
+		callback( 'Your browser is not VR Ready' );
 
-    this.update = function () {
+	}
 
-        if ( vrInput === undefined ) return;
+	// the Rift SDK returns the position in meters
+	// this scale factor allows the user to define how meters
+	// are converted to scene units.
+	this.scale = 1;
 
-        var state = vrInput.getState();
+	this.update = function () {
 
-        if ( state.orientation !== null ) {
+		if ( vrInput === undefined ) return;
 
-            object.quaternion.copy( state.orientation );
+		var state = vrInput.getState();
 
-        }
+		if ( state.orientation !== null ) {
 
-        if ( state.position !== null ) {
+			object.quaternion.copy( state.orientation );
 
-            object.position.copy( state.position );
+		}
 
-        }
+		if ( state.position !== null ) {
 
-    };
+			object.position.copy( state.position ).multiplyScalar( scope.scale );
 
-    this.zeroSensor = function () {
+		}
 
-        if ( vrInput === undefined ) return;
+	};
 
-        vrInput.zeroSensor();
+	this.zeroSensor = function () {
 
-    };
+		if ( vrInput === undefined ) return;
+
+		vrInput.zeroSensor();
+
+	};
 
 };
